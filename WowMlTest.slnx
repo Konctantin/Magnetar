@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="Magnetar.Core/Magnetar.Core.csproj" />
-  <Project Path="Magnetar.UI/Magnetar.UI.csproj" />
-  <Project Path="WowMl.UI/WowMl.UI.csproj" />
-</Solution>
