@@ -1,6 +1,5 @@
 <Solution>
-  <Project Path="Magnetar.Core.Tests/Magnetar.Core.Tests.csproj" Id="19cd2969-a83c-43be-92dc-5baa0ff730d4" />
-  <Project Path="Magnetar.Core/Magnetar.Core.csproj" Id="67e69c1d-3f47-4572-9433-3e902e8e7109" />
+  <Project Path="Magnetar.Core/Magnetar.Core.csproj" />
+  <Project Path="Magnetar.UI/Magnetar.UI.csproj" />
   <Project Path="WowMl.UI/WowMl.UI.csproj" />
-  <Project Path="WowMlTest/WowMlTest.csproj" />
 </Solution>
