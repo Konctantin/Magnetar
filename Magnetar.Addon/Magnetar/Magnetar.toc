@@ -1,0 +1,12 @@
+## Interface: 120100, 50504, 40402, 30404, 20506, 16001, 11509
+## Title: Magnetar
+## Notes: Magnetar
+## Version: 0.2.0
+## Author: You
+## IconTexture: Interface\ICONS\Achievement_Reputation_KirinTor
+## SavedVariables: MAGNETAR_STORAGE
+## SavedVariablesPerCharacter: MAGNETAR_PRESONAL_STORAGE
+## RequiredDeps: Blizzard_AuraContainer
+
+ControlPanel.lua
+Magnetar.lua
