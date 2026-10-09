@@ -59,5 +59,26 @@ namespace Magnetar.UI.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot;?&gt;
+        ///&lt;SyntaxDefinition name=&quot;MyDSL&quot; xmlns=&quot;http://icsharpcode.net&quot;&gt;
+        ///	&lt;!-- Цвета --&gt;
+        ///	&lt;Color name=&quot;Comment&quot; foreground=&quot;Green&quot; /&gt;
+        ///	&lt;Color name=&quot;Keywords&quot; foreground=&quot;Blue&quot; fontWeight=&quot;bold&quot; /&gt;
+        ///	&lt;Color name=&quot;Identifiers&quot; foreground=&quot;DarkCyan&quot; /&gt;
+        ///	&lt;Color name=&quot;Numbers&quot; foreground=&quot;DarkRed&quot; /&gt;
+        ///	&lt;Color name=&quot;Operators&quot; foreground=&quot;Purple&quot; fontWeight=&quot;bold&quot; /&gt;
+        ///	&lt;Color name=&quot;Brackets&quot; foreground=&quot;DarkSlateGray&quot; /&gt;
+        ///
+        ///	&lt;RuleSet&gt;
+        ///		&lt;!-- Комментарии (если вы решите их добавить, например через //) --&gt;
+        ///	 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MacroHighlighting {
+            get {
+                return ResourceManager.GetString("MacroHighlighting", resourceCulture);
+            }
+        }
     }
 }

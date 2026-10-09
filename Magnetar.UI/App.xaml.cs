@@ -12,9 +12,9 @@ namespace Magnetar.UI;
 
 public partial class App : Application
 {
-    private Window? _mainWindow;
-    private TaskbarIcon? _notifyIcon;
-    private MainViewModel? _viewModel;
+    private Window? mainWindow;
+    private TaskbarIcon? notifyIcon;
+    private MainViewModel? viewModel;
 
     public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
@@ -41,21 +41,21 @@ public partial class App : Application
 
             ServiceProvider = services.BuildServiceProvider();
 
-            _viewModel = ServiceProvider.GetRequiredService<MainViewModel>();
+            viewModel = ServiceProvider.GetRequiredService<MainViewModel>();
 
-            _notifyIcon = new TaskbarIcon
+            notifyIcon = new TaskbarIcon
             {
                 IconSource = new BitmapImage(new Uri("pack://application:,,,/app.ico")),
-                ToolTipText = "Magnetar UI (Работает в фоне)",
+                ToolTipText = "Magnetar",
                 ContextMenu = (ContextMenu)FindResource("TrayMenu"),
-                DataContext = _viewModel
+                DataContext = viewModel
             };
 
-            _notifyIcon.ForceCreate();
+            notifyIcon.ForceCreate();
 
-            _notifyIcon.DoubleClickCommand = _viewModel.ShowWindowCommand;
-            _viewModel.RequestShowWindow += OnRequestShowWindow;
-            _viewModel.RequestCloseApplication += OnRequestCloseApplication;
+            notifyIcon.DoubleClickCommand = viewModel.ShowWindowCommand;
+            viewModel.RequestShowWindow += OnRequestShowWindow;
+            viewModel.RequestCloseApplication += OnRequestCloseApplication;
 
 
             ServiceProvider.GetRequiredService<MagnetarService>().Start();
@@ -78,26 +78,26 @@ public partial class App : Application
 
     private void OnRequestShowWindow()
     {
-        if (_mainWindow == null)
+        if (mainWindow == null)
         {
-            _mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-            _mainWindow.Closing += (s, args) =>
+            mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Closing += (s, args) =>
             {
                 args.Cancel = true;
-                _mainWindow.Hide();
+                mainWindow.Hide();
             };
         }
 
-        _mainWindow.Show();
-        _mainWindow.WindowState = WindowState.Normal;
-        _mainWindow.Activate();
+        mainWindow.Show();
+        mainWindow.WindowState = WindowState.Normal;
+        mainWindow.Activate();
     }
 
     private void OnRequestCloseApplication()
     {
         ServiceProvider?.GetService<MagnetarService>()?.Dispose();
 
-        _notifyIcon?.Dispose();
+        notifyIcon?.Dispose();
         Shutdown();
     }
 }

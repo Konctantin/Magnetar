@@ -11,17 +11,41 @@
 
   <ItemGroup>
     <None Remove="app.ico" />
+    <None Remove="Images\Druid.png" />
+    <None Remove="Images\Hunter.png" />
+    <None Remove="Images\Mage.png" />
+    <None Remove="Images\Paladin.png" />
+    <None Remove="Images\Priest.png" />
+    <None Remove="Images\Rogue.png" />
+    <None Remove="Images\Shaman.png" />
+    <None Remove="Images\StatusDisabled.ico" />
+    <None Remove="Images\StatusEnabled.ico" />
+    <None Remove="Images\Warlock.png" />
+    <None Remove="Images\Warrior.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="app.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Images\Druid.png" />
+    <Resource Include="Images\Hunter.png" />
+    <Resource Include="Images\Mage.png" />
+    <Resource Include="Images\Paladin.png" />
+    <Resource Include="Images\Priest.png" />
+    <Resource Include="Images\Rogue.png" />
+    <Resource Include="Images\Shaman.png" />
+    <Resource Include="Images\StatusDisabled.ico" />
+    <Resource Include="Images\StatusEnabled.ico" />
+    <Resource Include="Images\Warlock.png" />
+    <Resource Include="Images\Warrior.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.4.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="Superpower" Version="3.2.1" />
   </ItemGroup>
 
   <ItemGroup>

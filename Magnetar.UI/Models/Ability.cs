@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Magnetar.UI.Models;
 
-internal class Ability
+public class Ability
 {
+    public List<Condition> Conditions { get; set; } = [];
+
+    public List<Ability> Children { get; set; } = [];
 }
