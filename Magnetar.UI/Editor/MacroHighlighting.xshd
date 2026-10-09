@@ -1,43 +1,12 @@
 <?xml version="1.0"?>
-<SyntaxDefinition name="MyDSL" xmlns="http://icsharpcode.net">
-	<!-- Цвета -->
-	<Color name="Comment" foreground="Green" />
-	<Color name="Keywords" foreground="Blue" fontWeight="bold" />
-	<Color name="Identifiers" foreground="DarkCyan" />
-	<Color name="Numbers" foreground="DarkRed" />
-	<Color name="Operators" foreground="Purple" fontWeight="bold" />
-	<Color name="Brackets" foreground="DarkSlateGray" />
+<SyntaxDefinition name="MACRO" extensions=".macro" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<Color name="Comment"     foreground="Gray" />
+
 
 	<RuleSet>
-		<!-- Комментарии (если вы решите их добавить, например через //) -->
-		<Span color="Comment" begin="//" />
+		<Span color="Comment">
+			<Begin>--</Begin>
+		</Span>
 
-		<!-- Ключевые слова -->
-		<Keywords color="Keywords">
-			<Word>exit</Word>
-			<Word>if</Word>
-			<Word>end</Word>
-			<Word>#tank</Word>
-		</Keywords>
-
-		<!-- Названия функций/типов действий перед скобками: spell, item, macros -->
-		<Rule color="Identifiers">
-			\b(spell|item|macros|target|player)\b
-		</Rule>
-
-		<!-- Числа -->
-		<Rule color="Numbers">
-			\b\d+\b
-		</Rule>
-
-		<!-- Операторы и спецсимволы -->
-		<Rule color="Operators">
-			[&amp;|!!&lt;&gt;=:]
-		</Rule>
-
-		<!-- Выделение квадратных скобок условий [...] -->
-		<Rule color="Brackets">
-			[\[\]\(\)]
-		</Rule>
 	</RuleSet>
 </SyntaxDefinition>

@@ -86,15 +86,10 @@ public sealed class ForegroundWindowService(ScreenSnapshotService _snapshot) : I
             : titles.Any(IsTitle);
     }
 
-    public Rect GetForegroundRect()
+    public Rect GetForegroundRect(IntPtr handle)
     {
-        var windowHandle = Handle;
-
-        if (windowHandle == IntPtr.Zero)
-            throw new InvalidOperationException("Активное окно не найдено.");
-
         int result = DwmGetWindowAttribute(
-            windowHandle,
+            handle,
             DwmExtendedFrameBounds,
             out Rect rect,
             Rect.Size);
@@ -117,14 +112,18 @@ public sealed class ForegroundWindowService(ScreenSnapshotService _snapshot) : I
     /// <summary>
     /// Делает снимок нижней части активного окна.
     /// </summary>
-    public Bitmap CaptureBottomArea(int width = DefaultCaptureWidth, int height = DefaultCaptureHeight)
+    public void CaptureBottomArea(int width = DefaultCaptureWidth, int height = DefaultCaptureHeight)
     {
-        Rect rect = GetForegroundRect();
+        var handle = Handle;
+        if (handle == IntPtr.Zero)
+            return;
+
+        var rect = GetForegroundRect(handle);
 
         int left = rect.Left;
         int top = rect.Bottom - height;
 
-        return _snapshot.Capture(left, top, width, height);
+        _snapshot.Capture(left, top, width, height);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using Magnetar.UI.Common;
+using Magnetar.UI.Models;
 using Magnetar.UI.Services;
 using System.ComponentModel;
 using System.Drawing;
@@ -14,6 +15,7 @@ namespace Magnetar.UI.ViewModels;
 public class MainViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly MagnetarService _magnetarService;
+    private readonly StateService _stateService;
 
     public event Action? RequestShowWindow;
     public event Action? RequestCloseApplication;
@@ -35,7 +37,24 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public MainViewModel(MagnetarService magnetarService)
+    public string CurrentState
+    {
+        get;
+        private set
+        {
+            field = value;
+            OnPropertyChanged();
+        }
+    } = "";
+
+    public List<WowClassEntity> ClassList { get; } =
+        Enum.GetValues(typeof(WowClass))
+        .Cast<WowClass>()
+        .Where(c => c != WowClass.None)
+        .Select(v => new WowClassEntity { Class = v }).ToList()
+        ;
+
+    public MainViewModel(MagnetarService magnetarService, StateService stateService)
     {
         // Инициализируем команды
         ShowWindowCommand = new RelayCommand(_ => RequestShowWindow?.Invoke());
@@ -43,6 +62,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         ExitCommand = new RelayCommand(_ => RequestCloseApplication?.Invoke());
 
         _magnetarService = magnetarService;
+        _stateService = stateService;
 
         // Подписываемся на события фонового сервиса
         _magnetarService = magnetarService;
@@ -83,6 +103,8 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                 CurrentImage.Unlock();
                 sharedBitmap.UnlockBits(bitmapData);
             }
+
+            CurrentState = _stateService.ToString() ?? "";
         });
     }
 

@@ -4,18 +4,46 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Magnetar.UI"
+        xmlns:editor="clr-namespace:Magnetar.UI.Editor"
         mc:Ignorable="d"
         Title="MainWindow"
+        d:DesignWidth="800"
+        d:DesignHeight="600"
         >
-    <Grid Background="#222222">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48*"/>
+            <ColumnDefinition Width="509*"/>
+            <ColumnDefinition Width="243*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="197*"/>
+            <RowDefinition Height="284*"/>
+            <RowDefinition Height="83*"/>
+        </Grid.RowDefinitions>
 
-            <!-- Привязываем источник картинки к свойству CurrentImage из ViewModel -->
-            <Border BorderBrush="White" BorderThickness="2" CornerRadius="5" Margin="10">
-                <Image Source="{Binding CurrentImage}" Width="300" Height="300" Stretch="Uniform"/>
-            </Border>
+        <ListBox 
+            x:Name="profiLeList" 
+            IsSynchronizedWithCurrentItem="true" 
+            ItemsSource="{Binding ClassList}" 
+            Grid.Row="1" Grid.RowSpan="3" 
+            HorizontalContentAlignment="Center" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding ClassImage}" Width="64" ToolTip="{Binding Class}" Cursor="Hand" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-            <TextBlock Text="Обновление: 10 раз в сек." Foreground="Gray" HorizontalAlignment="Center"/>
-        </StackPanel>
+        <editor:MacroCodeEditor Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" 
+                                Document="{Binding ClassList/Code, Mode=TwoWay}" 
+                                FontFamily="Consolas"
+                                />
+
+        <Image Source="{Binding CurrentImage}" Grid.Column="2" Grid.Row="1" Stretch="Uniform"/>
+
+        <TextBlock Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Text="{Binding CurrentState}" />
+
     </Grid>
 </Window>

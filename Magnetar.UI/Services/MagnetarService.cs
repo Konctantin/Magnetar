@@ -46,11 +46,14 @@ public class MagnetarService : IDisposable
         Application.Current.Dispatcher.Invoke(() => {
             try
             {
+                if (_foregroundService.Handle == IntPtr.Zero)
+                    return;
+
                 var titles = _settings.WowTitles.Split([',', ';'],
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-                if (!_foregroundService.IsTitle(titles))
-                    return;
+                //if (!_foregroundService.IsTitle(titles))
+                //    return;
 
                 _foregroundService.CaptureBottomArea(_settings.AreaWidth, _settings.AreaHeight);
                 _stateService.Parse();

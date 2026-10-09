@@ -1,4 +1,5 @@
 using Magnetar.UI.Models;
+using System.Text;
 
 namespace Magnetar.UI.Services;
 
@@ -98,5 +99,17 @@ public class StateService(ForegroundWindowService foreground)
 
     private void ParseTargetDebuffs()
     {
+    }
+
+    public override string ToString()
+    {
+        var buff = new StringBuilder();
+
+        buff.AppendLine($"IsInWorld: {IsInWorld}");
+        buff.AppendLine($"PlayerClass: {PlayerClass}");
+
+        //todo: add more
+
+        return buff.ToString();
     }
 }

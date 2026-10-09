@@ -6,11 +6,16 @@
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
-            <ContextMenu x:Key="TrayMenu">
-                <MenuItem Header="Открыть окно" Command="{Binding ShowWindowCommand}" FontWeight="Bold"/>
-                <Separator />
-                <MenuItem Header="Выход" Command="{Binding ExitCommand}"/>
-            </ContextMenu>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Editor/MacroCodeEditor.xaml" />
+                <ResourceDictionary>
+                    <ContextMenu x:Key="TrayMenu">
+                        <MenuItem Header="Открыть окно" Command="{Binding ShowWindowCommand}" FontWeight="Bold"/>
+                        <Separator />
+                        <MenuItem Header="Выход" Command="{Binding ExitCommand}"/>
+                    </ContextMenu>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

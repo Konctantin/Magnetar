@@ -11,9 +11,13 @@
 
   <ItemGroup>
     <None Remove="app.ico" />
+    <None Remove="Images\DeathKnight.png" />
+    <None Remove="Images\DemonHunter.png" />
     <None Remove="Images\Druid.png" />
     <None Remove="Images\Hunter.png" />
     <None Remove="Images\Mage.png" />
+    <None Remove="Images\Monk.png" />
+    <None Remove="Images\None.png" />
     <None Remove="Images\Paladin.png" />
     <None Remove="Images\Priest.png" />
     <None Remove="Images\Rogue.png" />
@@ -28,9 +32,12 @@
     <Resource Include="app.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Images\DeathKnight.png" />
+    <Resource Include="Images\DemonHunter.png" />
     <Resource Include="Images\Druid.png" />
     <Resource Include="Images\Hunter.png" />
     <Resource Include="Images\Mage.png" />
+    <Resource Include="Images\Monk.png" />
     <Resource Include="Images\Paladin.png" />
     <Resource Include="Images\Priest.png" />
     <Resource Include="Images\Rogue.png" />

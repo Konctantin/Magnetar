@@ -22,7 +22,7 @@ internal class MacroCodeEditor : TextEditor, IDisposable
 
     void InstallHighlighting()
     {
-        using XmlReader reader = new XmlTextReader(new StringReader(Properties.Resources.MacroHighlighting));
+        using var reader = new XmlTextReader(new StringReader(Properties.Resources.MacroHighlighting));
         var luaHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
         HighlightingManager.Instance.RegisterHighlighting("Macro", [".macro"], luaHighlighting);
         SyntaxHighlighting = luaHighlighting;
