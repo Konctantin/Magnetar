@@ -5,15 +5,28 @@ namespace Magnetar.UI.Services;
 
 public class StateService(ForegroundWindowService foreground)
 {
+    const int MAX_ABILITIES = 24;
+    const int MAX_AURAS = 20;
+
     public bool IsValidArea {  get; private set; }
 
     public string ValidationError { get; private set; } = "";
+
+    public bool Enabled { get; private set; }
+
+    public bool IsAoe { get; private set; }
+
+    public bool IsKick { get; private set; }
+
+    public bool IsBurst { get; private set; }
 
     public bool IsInWorld { get; private set; }
 
     public bool IsInCombat { get; private set; }
 
     public WowClass PlayerClass { get; private set; }
+
+    public int PlayerLevel { get; private set; }
 
     public int PlayerHpp { get; private set; }
 
@@ -40,16 +53,18 @@ public class StateService(ForegroundWindowService foreground)
 
     public int TargetLevel { get; private set; }
 
-    public bool TargetIsBoss {  get; private set; }
+    public bool TargetIsBoss { get; private set; }
 
-    public int TargetAgro {  get; private set; }
+    public int TargetAgro { get; private set; }
 
 
-    public List<int> PlayerAbilities { get; private set; } = [];
+    public ActionData[] PlayerAbilities { get; init; } = new ActionData[MAX_ABILITIES];
 
-    public List<int> PlayerBuffs { get; private set; } = [];
+    public AuraData[] PlayerBuffs { get; init; } = new AuraData[MAX_AURAS];
 
-    public List<int> TargetDebuffs { get; private set; } = [];
+    public AuraData[] TargetDebuffs { get; init; } = new AuraData[MAX_AURAS];
+
+    public AuraData[] FocusDebuffs { get; init; } = new AuraData[MAX_AURAS];
 
 
     public void Parse()
@@ -59,23 +74,26 @@ public class StateService(ForegroundWindowService foreground)
 
         IsInWorld = foreground.GetBool(0, 0);
         PlayerClass = (WowClass)foreground.GetInt(0, 0);
+        PlayerLevel = foreground.GetInt(0, 0);
 
         ParsePlayerAbilities();
-        ParsePlayerBuffs();
-        ParseTargetDebuffs();
+
+        ParseAuras(0); // player buffs
+        ParseAuras(0); // target debuffs
+        ParseAuras(0); // focus debuffs
     }
 
     private bool ParseValidation()
     {
         var topLeft = foreground.GetInt(0, 0);
-        var topRight = foreground.GetInt(0, 0);
-        var bottomRight = foreground.GetInt(0, 0);
-        var bottomLeft = foreground.GetInt(0, 0);
+        var topRight = foreground.GetInt(0, 200);
+        var bottomRight = foreground.GetInt(200, 200);
+        var bottomLeft = foreground.GetInt(200, 0);
 
-        if (topLeft != 0
-            && topRight != 0
-            && bottomRight != 0
-            && bottomLeft != 0)
+        if (topLeft != 123456
+            && topRight != 123456
+            && bottomRight != 123456
+            && bottomLeft != 123456)
         {
             IsValidArea = true;
             ValidationError = "";
@@ -93,11 +111,7 @@ public class StateService(ForegroundWindowService foreground)
     {
     }
 
-    private void ParsePlayerBuffs()
-    {
-    }
-
-    private void ParseTargetDebuffs()
+    private void ParseAuras(int rowOffset)
     {
     }
 
