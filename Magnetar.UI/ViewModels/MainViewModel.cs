@@ -1,9 +1,11 @@
 using Magnetar.UI.Common;
 using Magnetar.UI.Models;
+using Magnetar.UI.Properties;
 using Magnetar.UI.Services;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -16,6 +18,8 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly MagnetarService _magnetarService;
     private readonly StateService _stateService;
+
+    private readonly Settings _settings;
 
     public event Action? RequestShowWindow;
     public event Action? RequestCloseApplication;
@@ -54,7 +58,40 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         .Select(v => new WowClassEntity { Class = v }).ToList()
         ;
 
-    public MainViewModel(MagnetarService magnetarService, StateService stateService)
+    public int AreaHeight
+    {
+        get => _settings.AreaHeight;
+        set
+        {
+            _settings.AreaHeight = value;
+            _settings.Save();
+            OnPropertyChanged();
+        }
+    }
+
+    public int AreaWidth
+    {
+        get => _settings.AreaWidth;
+        set
+        {
+            _settings.AreaWidth = value;
+            _settings.Save();
+            OnPropertyChanged();
+        }
+    }
+
+    public int Interval
+    {
+        get => _settings.Interval;
+        set
+        {
+            _settings.Interval = value;
+            _settings.Save();
+            OnPropertyChanged();
+        }
+    }
+
+    public MainViewModel(MagnetarService magnetarService, StateService stateService, Settings settings)
     {
         // Инициализируем команды
         ShowWindowCommand = new RelayCommand(_ => RequestShowWindow?.Invoke());
@@ -63,6 +100,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
         _magnetarService = magnetarService;
         _stateService = stateService;
+        _settings = settings;
 
         // Подписываемся на события фонового сервиса
         _magnetarService = magnetarService;

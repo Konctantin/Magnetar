@@ -17,7 +17,7 @@ public class KeyRecord(int key, int modifier)
     {
         return mod switch
         {
-            0xA0 => "S",
+            16 => "S",
             0xA2 => "C",
             0xA4 => "A",
             _ => "",

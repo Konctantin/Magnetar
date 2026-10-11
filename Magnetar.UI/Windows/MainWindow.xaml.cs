@@ -1,3 +1,4 @@
+using Magnetar.UI.Properties;
 using Magnetar.UI.ViewModels;
 using System.Windows;
 

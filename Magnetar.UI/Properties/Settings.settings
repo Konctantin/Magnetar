@@ -6,10 +6,10 @@
       <Value Profile="(Default)">20</Value>
     </Setting>
     <Setting Name="AreaWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">300</Value>
+      <Value Profile="(Default)">205</Value>
     </Setting>
     <Setting Name="AreaHeight" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">300</Value>
+      <Value Profile="(Default)">71</Value>
     </Setting>
     <Setting Name="WowTitles" Type="System.String" Scope="User">
       <Value Profile="(Default)">World of Warcraft</Value>

@@ -142,6 +142,21 @@ public sealed class ScreenSnapshotService : IDisposable
         return _bitmapSource;
     }
 
+    private void ValidateCoordinates(int x, int y)
+    {
+        if (_image == null)
+        {
+            throw new InvalidOperationException(
+                "Сначала необходимо создать снимок.");
+        }
+
+        if (x < 0 || x >= Width)
+            throw new ArgumentOutOfRangeException(nameof(x));
+
+        if (y < 0 || y >= Height)
+            throw new ArgumentOutOfRangeException(nameof(y));
+    }
+
     /// <summary>
     /// Возвращает цвет пикселя в формате 0xRRGGBB.
     /// Альфа-канал не используется.
@@ -249,20 +264,7 @@ public sealed class ScreenSnapshotService : IDisposable
         }
     }
 
-    private void ValidateCoordinates(int x, int y)
-    {
-        if (_image == null)
-        {
-            throw new InvalidOperationException(
-                "Сначала необходимо создать снимок.");
-        }
 
-        if (x < 0 || x >= Width)
-            throw new ArgumentOutOfRangeException(nameof(x));
-
-        if (y < 0 || y >= Height)
-            throw new ArgumentOutOfRangeException(nameof(y));
-    }
 
     private static void ValidateSize(int width, int height)
     {

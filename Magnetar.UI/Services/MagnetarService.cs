@@ -52,8 +52,8 @@ public class MagnetarService : IDisposable
                 var titles = _settings.WowTitles.Split([',', ';'],
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-                //if (!_foregroundService.IsTitle(titles))
-                //    return;
+                if (!_foregroundService.IsTitle(titles))
+                    return;
 
                 _foregroundService.CaptureBottomArea(_settings.AreaWidth, _settings.AreaHeight);
                 _stateService.Parse();
@@ -63,9 +63,6 @@ public class MagnetarService : IDisposable
                 {
                     AreaCaptured?.Invoke(bitmap);
                 }
-
-                // _foregroundService.Image;
-                // todo: more logic
             }
             finally
             {
