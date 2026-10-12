@@ -45,10 +45,23 @@ local function Half(v) return math.floor(v / 2) end
 
 -- Сплошной квадрат внутри FontString, r/g/b: 0..255
 local function Swatch(r, g, b)
-    return ("|T%s:%d:%d:0:0:8:8:0:8:0:8:%d:%d:%d|t"):format(SWATCH_TEXTURE, AURA_CELL, AURA_CELL, r, g, b);
+    return ("\124T%s:%d:%d:0:0:8:8:0:8:0:8:%d:%d:%d\124t"):format(SWATCH_TEXTURE, 2, 2, r, g, b);
 end
 
+-- /run print(("|T%s:%d:%d:0:0:8:8:0:8:0:8:%d:%d:%d|t"):format("Interface\\Buttons\\WHITE8X8", 10, 10, 1, 0, 0));
+
 local COLOR_TRUE, COLOR_FALSE = CreateColor(IntToColor(1)), CreateColor(IntToColor(0));
+
+local function createFlag(...)
+    local accumulator = 0;
+    local args = {...};
+    for i = 1, #args do
+        if args[i] then
+            accumulator = accumulator + 2^(i - 1);
+        end
+    end
+    return accumulator;
+end
 
 -- Step: [0.00, 0.05) -> 0, [0.05, 0.10) -> 5, ..., 1.00 -> 100
 local function CreatePercentCurve()
@@ -543,6 +556,7 @@ local function InitAuraButton(button)
     -- 1. DurationCell: снизу-слева ПОД иконкой
     button.DurationCell = CreateCellAura(button, cellWidth, cellHeight);
     button.DurationCell:SetPoint("TOPLEFT", button.Icon, "BOTTOMLEFT", 0, 0);
+    button.DurationCell:SetSize(2,2);
 
     local binding = C_DurationUtil.CreateDurationTextBinding();
     binding:SetFormatter(T.DurationFormatter);
@@ -557,17 +571,18 @@ local function InitAuraButton(button)
 
     -- 2. StackCell: снизу-справа ПОД иконкой (стыкуется к правому краю DurationCell)
     button.StackCell = CreateCellAura(button, cellWidth, cellHeight);
-    button.StackCell:SetPoint("TOPLEFT", button.DurationCell, "TOPRIGHT", 0, 0);
+    button.StackCell:SetPoint("TOPLEFT", button.Icon, "BOTTOMLEFT", 2, 0);
+    button.StackCell:SetSize(2,2);
     
     button:SetApplicationCount(button.StackCell, { formatter = T.StackFormatter });
 end
 
 -- column: 1, 2, ... — колонки идут вправо от AURA_X_PX
-local function CreateAuraBar(unit, filter, column)
+local function CreateAuraBar(unit, filter, row)
     local c = CreateFrame("AuraContainer", nil, T.MagnetarFrame, "CustomAuraContainerTemplate");
     c:SetSize(AURA_BUTTON_W, AURA_MAX * (AURA_CELL + AURA_GAP)); -- ровно одна колонка
     c:SetFrameLevel(100);
-    c:SetPoint("BOTTOMLEFT", T.MagnetarFrame, "BOTTOMLEFT", AURA_X_PX / AURA_SCALE + (column - 1) * (AURA_BUTTON_W + 10), 0);
+    c:SetPoint("BOTTOMLEFT", T.MagnetarFrame, "BOTTOMLEFT", 0, row);
     c:SetUnit(unit);
     c:SetFlowLayoutAxis(AnchorUtil.FlowLayoutAxis.Horizontal);
     c:SetFlowLayoutGrowthDirection(1, -1);
@@ -579,6 +594,6 @@ local function CreateAuraBar(unit, filter, column)
     return c;
 end
 
-T.PlayerContainer = CreateAuraBar("player", "HELPFUL|PLAYER|RAID", 1);
-T.TargetContainer = CreateAuraBar("target", "HARMFUL|PLAYER", 2);
+T.PlayerContainer = CreateAuraBar("player", "HELPFUL|PLAYER|RAID", 22);
+T.TargetContainer = CreateAuraBar("target", "HARMFUL|PLAYER", 45);
 ApplyScales();
