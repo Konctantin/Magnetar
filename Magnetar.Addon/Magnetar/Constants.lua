@@ -44,12 +44,13 @@ local function GetDurationBreakpoints()
     return T.DurationBreakpoints;
 end
 
+-- /dump /dump Magnetar.StackBreakpoints
 local function GetStackBreakpoints()
-    local bps = { };
+    T.StackBreakpoints = { };
     for i = 0, 50 do
-        table.insert(bps, { threshold = i, format = IntToFormat(i) });
+        table.insert(T.StackBreakpoints, { threshold = i, format = IntToFormat(i) });
     end
-    return bps;
+    return T.StackBreakpoints;
 end
 
 local function CreateRuleFormatter(breakpoints)
