@@ -1,14 +1,10 @@
 local addonName, T = ...;
 _G[addonName] = T;
 
-T.ACTION_BAR_TYPES = { 'Action', 'MultiBarBottomLeft', 'MultiBarBottomRight', 'MultiBarRight', 'MultiBarLeft' };
-
--- ==================== CONFIG ====================
-local INFO_WIDTH = 200;
-local INFO_HEIGHT = 70;
-local TICK_INTERVAL = 0.15
-local AURA_SCALE = 1
-local AURA_CELL, AURA_GAP, AURA_MAX = 10, 0, 10
+local INFO_WIDTH    = 200;
+local INFO_HEIGHT   = 70;
+local AURA_CELL     = 10;
+local AURA_MAX      = 10;
 
 local function InitStorage()
     MAGNETAR_PRESONAL_STORAGE = MAGNETAR_PRESONAL_STORAGE or {}
@@ -30,31 +26,7 @@ end
 
 -- ==================== COLOR HELPERS ====================
 local function IntToColor(v)
-    return (v % 256) / 255, (math.floor(v / 256) % 256) / 255, (math.floor(v / 65536) % 256) / 255, 1
-end
-
-local function createFlag(...)
-    local accumulator = 0;
-    local args = {...};
-    for i = 1, #args do
-        if args[i] then
-            accumulator = accumulator + 2 ^ (i - 1);
-        end
-    end
-    return accumulator;
-end
-
--- /dump Magnetar.CreateFlag(true)
-T.CreateFlag = createFlag;
-
--- Step: [0.00, 0.05) -> 0, [0.05, 0.10) -> 5, ..., 1.00 -> 100
-local function CreatePercentCurve()
-    local curve = C_CurveUtil.CreateColorCurve();
-    curve:SetType(Enum.LuaCurveType.Step);
-    for k = 0, 20 do
-        curve:AddPoint(k / 20, CreateColor(IntToColor(k * 5)));
-    end
-    return curve;
+    return (v % 256) / 255, (math.floor(v / 256) % 256) / 255, (math.floor(v / 65536) % 256) / 255, 1;
 end
 
 -- ==================== SCALE ====================
@@ -64,12 +36,16 @@ local function PixelScale()
 end
 
 local function ApplyScales()
-    local s = PixelScale()
-    if T.MagnetarFrame then T.MagnetarFrame:SetScale(s) end
-    if InCombatLockdown() then return end
+    local s = PixelScale();
+    if T.MagnetarFrame then
+        T.MagnetarFrame:SetScale(s);
+    end
+    if InCombatLockdown() then
+        return;
+    end
     for _, key in ipairs({ "PlayerContainer", "TargetContainer" }) do
         local c = T[key]
-        if c then c:SetScale(s * AURA_SCALE / UIParent:GetEffectiveScale()) end
+        if c then c:SetScale(s / UIParent:GetEffectiveScale()) end
     end
 end
 
@@ -113,53 +89,40 @@ local function UpdateTextData(blockIndex, text)
     end
 end
 
-local function SetCurveCell(col, color)
-    T.GeneralBar[col]:SetColorTexture(color:GetRGBA());
-end
-
 local function UpdateGeneralInfo()
-    local hc = T.MagnetarFrame.hc;
+    T.GeneralBar[1]:SetColorValue(123456); --magic
 
-    T.GeneralBar[1]:SetColorTexture(IntToColor(123456)); --magic
+    T.GeneralBar[2]:SetColorValue(T.GetToggle("Magnetar_ControlPanel_EnabledButton"));
+    T.GeneralBar[3]:SetColorValue(T.GetToggle("Magnetar_ControlPanel_AoeButton"));
+    T.GeneralBar[4]:SetColorValue(T.GetToggle("Magnetar_ControlPanel_KickButton"));
+    T.GeneralBar[5]:SetColorValue(T.GetToggle("Magnetar_ControlPanel_CDButton"));
 
-    T.GeneralBar[2]:SetColorTexture(IntToColor(T.GetToggle("Magnetar_ControlPanel_EnabledButton") and 1 or 0));
-    T.GeneralBar[3]:SetColorTexture(IntToColor(T.GetToggle("Magnetar_ControlPanel_AoeButton") and 1 or 0));
-    T.GeneralBar[4]:SetColorTexture(IntToColor(T.GetToggle("Magnetar_ControlPanel_KickButton") and 1 or 0));
-    T.GeneralBar[5]:SetColorTexture(IntToColor(T.GetToggle("Magnetar_ControlPanel_CDButton") and 1 or 0));
+    T.GeneralBar[10]:SetColorValue(UnitAffectingCombat("player"));
+    T.GeneralBar[11]:SetColorValue(UnitIsDead("player"));
+    T.GeneralBar[12]:SetColorValue(IsPlayerMoving());
 
-    T.GeneralBar[10]:SetColorTexture(IntToColor(UnitAffectingCombat("player") and 1 or 0));
-    T.GeneralBar[11]:SetColorTexture(IntToColor(UnitIsDead("player") and 1 or 0));
-    T.GeneralBar[12]:SetColorTexture(IntToColor(IsPlayerMoving() and 1 or 0));
+    T.GeneralBar[13]:SetColorValue(UnitHealthPercent("player", false, T.PercentCurve));
+    T.GeneralBar[14]:SetColorValue(UnitPowerPercent("player", nil, false, T.PercentCurve));
+    T.GeneralBar[15]:SetColorValue(UnitPowerPercent("player", Enum.PowerType.ComboPoints, false, T.PercentCurve));
 
-    SetCurveCell(13, UnitHealthPercent("player", false, hc));
-    SetCurveCell(14, UnitPowerPercent("player", nil, false, hc));
-    SetCurveCell(15, UnitPowerPercent("player", Enum.PowerType.ComboPoints, false, hc));
+    T.GeneralBar[16]:SetColorValue(UnitLevel("player"));
+    T.GeneralBar[17]:SetColorValue(select(3, UnitClass("player")));
+    T.GeneralBar[18]:SetColorValue(GetShapeshiftForm());
+    T.GeneralBar[19]:SetColorValue(T.GetCastingRemains("player"));
+    T.GeneralBar[20]:SetColorValue(T.GetChannelRemains("player"));
+    T.GeneralBar[21]:SetColorValue(T.InRangeCount("Rend"));
 
-    T.GeneralBar[16]:SetColorTexture(IntToColor(UnitLevel("player")));
-    T.GeneralBar[17]:SetColorTexture(IntToColor(select(3, UnitClass("player"))));
-    T.GeneralBar[18]:SetColorTexture(IntToColor(GetShapeshiftForm()));
+    T.GeneralBar[30]:SetColorValue(UnitExists("target"));
+    --T.GeneralBar[31]:SetColorValue(T.CheckInterrupt("target"));
+    T.GeneralBar[35]:SetColorValue(UnitHealthPercent("target", false, T.PercentCurve));
+    T.GeneralBar[36]:SetColorValue(UnitPowerPercent("target", nil, false, T.PercentCurve));
+    T.GeneralBar[37]:SetColorValue(UnitPowerPercent("target", Enum.PowerType.ComboPoints, false, T.PercentCurve));
 
-    local endTime = select(5, UnitCastingInfo("player")) or 0;
-    local remains = math.max(0, math.floor((endTime - (GetTime() * 1000))));
-    T.GeneralBar[19]:SetColorTexture(IntToColor(remains));
-
-    endTime = select(5, UnitChannelInfo("player")) or 0;
-    remains = math.max(0, math.floor((endTime - (GetTime() * 1000))));
-    T.GeneralBar[20]:SetColorTexture(IntToColor(remains));
-
-    T.GeneralBar[21]:SetColorTexture(IntToColor(T.InRangeCount("Rend")));
-
-    T.GeneralBar[30]:SetColorTexture(IntToColor(UnitExists("target") and 1 or 0));
-    --T.GeneralBar[31]:SetColorTexture(IntToColor(T.CheckInterrupt("target") and 1 or 0));
-    SetCurveCell(35, UnitHealthPercent("target", false, hc));
-    SetCurveCell(36, UnitPowerPercent("target", nil, false, hc));
-    SetCurveCell(37, UnitPowerPercent("target", Enum.PowerType.ComboPoints, false, hc));
-
-    T.GeneralBar[50]:SetColorTexture(IntToColor(UnitExists("focus") and 1 or 0));
-    T.GeneralBar[51]:SetColorTexture(IntToColor(T.CheckInterrupt("focus") and 1 or 0));
-    SetCurveCell(55, UnitHealthPercent("focus", false, hc));
-    SetCurveCell(56, UnitPowerPercent("focus", nil, false, hc));
-    SetCurveCell(57, UnitPowerPercent("focus", Enum.PowerType.ComboPoints, false, hc));
+    T.GeneralBar[50]:SetColorValue(UnitExists("focus"));
+    --T.GeneralBar[51]:SetColorValue(T.CheckInterrupt("focus"));
+    T.GeneralBar[55]:SetColorValue(UnitHealthPercent("focus", false, T.PercentCurve));
+    T.GeneralBar[56]:SetColorValue(UnitPowerPercent("focus", nil, false, T.PercentCurve));
+    T.GeneralBar[57]:SetColorValue(UnitPowerPercent("focus", Enum.PowerType.ComboPoints, false, T.PercentCurve));
 end
 
 local function Tick()
@@ -170,7 +133,7 @@ end
 -- ==================== FRAMES ====================
 local function OnUpdate(self, elapsed)
     self.timer = (self.timer or 0) + elapsed
-    if self.timer < TICK_INTERVAL then return end
+    if self.timer < 0.15 then return end
     self.timer = 0
     Tick()
 end
@@ -221,7 +184,7 @@ function T.DumpAbilities()
                 elseif actionType == 'item' then
                     typeInt = 2;
                     local info = C_Item.GetItemNameByID(id);
-                    text = info;
+                    text = info or '';
                 end
                 local hotKeyColor = T.KeyMap[hotKey];
                 if text and hotKeyColor then
@@ -244,7 +207,7 @@ function T.DumpAbilities()
                         local isInRangeTarget = C_ActionBar.IsActionInRange(button.action, "target");
                         local isInRangeFocus = C_ActionBar.IsActionInRange(button.action, "focus");
 
-                        local flags = createFlag(
+                        local flags = T.CreateFlag(
                             cd_info.isOnGCD,
                             ---@diagnostic disable-next-line: undefined-field
                             cd_info.isActive,
@@ -324,7 +287,16 @@ local function InitMainFrame()
         tex:SetColorTexture(0, 0, 0, 1);
         ---@diagnostic disable-next-line: inject-field
         tex.SetColorValue = function(self, value)
-            self:SetColorTexture(0, 0, 0, 1);
+            local valType = type(value);
+            if valType == 'boolean' then
+                self:SetColorTexture(IntToColor(value and 1 or 0));
+            elseif valType == 'number' then
+                self:SetColorTexture(IntToColor(value));
+            elseif valType == "table" and type(value.GetRGBA) == "function" then
+                self:SetColorTexture(value:GetRGBA());
+            else
+                self:SetColorTexture(0, 0, 0, 1);
+            end
         end
         T.GeneralBar[i] = tex;
     end
@@ -379,7 +351,6 @@ local function InitMainFrame()
         T.AbilityBar[i] = ab;
     end
 
-    f.hc = CreatePercentCurve();
     local events = {
         "ADDON_LOADED",
         "PLAYER_ENTERING_WORLD",
@@ -398,8 +369,6 @@ end
 
 InitInfoFrame();
 InitMainFrame();
-
-local AURA_BUTTON_W = AURA_CELL * 3 + AURA_GAP * 2;
 
 local WHITE_TEXT_CURVE = C_CurveUtil.CreateColorCurve();
 WHITE_TEXT_CURVE:SetType(Enum.LuaCurveType.Step);
@@ -461,7 +430,7 @@ end
 
 local function CreateAuraBar(unit, filter, row)
     local c = CreateFrame("AuraContainer", nil, T.MagnetarFrame, "CustomAuraContainerTemplate");
-    c:SetSize(AURA_BUTTON_W, AURA_MAX * (AURA_CELL + AURA_GAP));
+    c:SetSize(AURA_CELL + 3, AURA_MAX * AURA_CELL);
     c:SetFrameLevel(100);
     c:SetPoint("BOTTOMLEFT", T.MagnetarFrame, "BOTTOMLEFT", 0, row);
     c:SetUnit(unit);

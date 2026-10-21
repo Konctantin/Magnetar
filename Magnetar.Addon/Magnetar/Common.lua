@@ -16,6 +16,18 @@ function T.CheckInterrupt(unit, sec)
     end
 end
 
+function T.GetCastingRemains(unit)
+    local endTime = select(5, UnitCastingInfo(unit)) or 0;
+    local remains = math.max(0, math.floor((endTime - (GetTime() * 1000))));
+    return remains;
+end
+
+function T.GetChannelRemains(unit)
+    local endTime = select(5, UnitChannelInfo(unit)) or 0;
+    local remains = math.max(0, math.floor((endTime - (GetTime() * 1000))));
+    return remains;
+end
+
 function T.InRangeCount(spellIdentifier)
     if not spellIdentifier or not C_Spell.SpellHasRange(spellIdentifier) then
         return 0;

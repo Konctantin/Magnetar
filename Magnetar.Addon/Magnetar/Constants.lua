@@ -1,25 +1,23 @@
 ﻿local addonName, T = ...;
 _G[addonName] = T;
 
+T.ACTION_BAR_TYPES = { 'Action', 'MultiBarBottomLeft', 'MultiBarBottomRight', 'MultiBarRight', 'MultiBarLeft' };
+
 local DURATION_EPSILON = 0.00001;
 
 local SWATCH_TEXTURE = "Interface\\Buttons\\WHITE8X8";
-
-local function Swatch(r, g, b)
-    return ("\124T%s:%d:%d:0:0:8:8:0:8:0:8:%d:%d:%d\124t"):format(SWATCH_TEXTURE, 2, 2, r, g, b);
-end
+local AURA_INFO_CELL_SIZE = 2;
 
 local function IntToColor(v)
     return (v % 256) / 255, (math.floor(v / 256) % 256) / 255, (math.floor(v / 65536) % 256) / 255, 1;
 end
 
-local function IntToTextureColor(v)
-    return (v % 256), (math.floor(v / 256) % 256), (math.floor(v / 65536) % 256), 1;
-end
-
 local function IntToFormat(val)
-    local r, g, b = IntToTextureColor(val);
-    local result = Swatch(r, g, b);
+    local r = val % 256;
+    local g = math.floor(val / 256) % 256;
+    local b = math.floor(val / 65536) % 256;
+    local result = ("\124T%s:%d:%d:0:0:8:8:0:8:0:8:%d:%d:%d\124t")
+        :format(SWATCH_TEXTURE, AURA_INFO_CELL_SIZE, AURA_INFO_CELL_SIZE, r, g, b);
     return result;
 end
 
@@ -28,8 +26,8 @@ T.IntToFormat = IntToFormat;
 
 -- /dump Magnetar.DurationBreakpoints
 local function GetDurationBreakpoints()
-    local i = 49;
-    T.DurationBreakpoints = { { threshold = 5000, format = IntToFormat(50) } };
+    T.DurationBreakpoints = { { threshold = 3600 + DURATION_EPSILON, format = IntToFormat(3600*100) } };
+    local i = 60;
     while i > 10 do
         table.insert(T.DurationBreakpoints, { threshold = i + DURATION_EPSILON, format = IntToFormat(i*100) });
         i = i - 1;
@@ -60,9 +58,34 @@ local function CreateRuleFormatter(breakpoints)
     return f;
 end
 
+-- Step: [0.00, 0.05) -> 0, [0.05, 0.10) -> 5, ..., 1.00 -> 100
+local function CreatePercentCurve()
+    local curve = C_CurveUtil.CreateColorCurve();
+    curve:SetType(Enum.LuaCurveType.Step);
+    for k = 0, 20 do
+        curve:AddPoint(k / 20, CreateColor(IntToColor(k * 5)));
+    end
+    return curve;
+end
+
+local function createFlag(...)
+    local accumulator = 0;
+    local args = {...};
+    for i = 1, #args do
+        if args[i] then
+            accumulator = accumulator + 2 ^ (i - 1);
+        end
+    end
+    return accumulator;
+end
+
+-- /dump Magnetar.CreateFlag(true)
+T.CreateFlag = createFlag;
+
 -- /dump Magnetar.DurationFormatter
 T.DurationFormatter = CreateRuleFormatter(GetDurationBreakpoints());
 T.StackFormatter = CreateRuleFormatter(GetStackBreakpoints());
+T.PercentCurve = CreatePercentCurve();
 
 T.KeyMap = {
     ['ESCAPE'] = { R = 0xB8/255, G = 0x17/255, B = 0x20/255 }, -- 0x00B81720
