@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Magnetar.UI.Test/Magnetar.UI.Test.csproj" Id="14957ec3-2c3f-4934-9cb3-d31f319436c5" />
   <Project Path="Magnetar.UI/Magnetar.UI.csproj" />
 </Solution>

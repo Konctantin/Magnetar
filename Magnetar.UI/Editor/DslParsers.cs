@@ -31,7 +31,8 @@ public static class DslParsers
 
     // Парсер выражений (Условий)
     private static TokenListParser<DslToken, ExpressionNode> Number =>
-        Token.EqualTo(DslToken.Number).Select(t => (ExpressionNode)new NumberExpression(int.Parse(t.ToStringValue())));
+        Token.EqualTo(DslToken.Number)
+        .Select(t => (ExpressionNode)new NumberExpression(int.Parse(t.ToStringValue())));
 
     private static TokenListParser<DslToken, ExpressionNode> Identifier =>
         Token.EqualTo(DslToken.Identifier).Select(t => (ExpressionNode)new IdentifierExpression(t.ToStringValue().Trim()));
