@@ -30,7 +30,16 @@ public class RotationService(
         if (!state.IsInWorld)
             return;
 
+        if (!state.Enabled)
+            return;
+
         if (!state.IsInCombat)
+            return;
+
+        if (state.PlayerCasting > 100)
+            return;
+
+        if (state.PlayerChanneling > 100)
             return;
 
         if (!Rotations.TryGetValue(state.PlayerClass, out var rotation))
