@@ -28,9 +28,10 @@ function T.GetChannelRemains(unit)
     return remains;
 end
 
+-- /dump UnitCastingDuration("target")
 function T.GetUnitCastingCurve(unit)
     local duration = UnitCastingDuration(unit);
-    if type(duration) == "table" and duration.EvaluateRemainingDuration then
+    if duration and duration.EvaluateRemainingDuration then
         local result = duration:EvaluateRemainingDuration(T.RemainingCurve, Enum.DurationTimeModifier.RealTime);
         return result;
     end

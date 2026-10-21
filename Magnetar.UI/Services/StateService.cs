@@ -63,7 +63,9 @@ public class StateService
 
     public int TargetHpp { get; private set; }
 
-    public bool TargetKick { get; private set; }
+    public int TargetCasting { get; private set; }
+
+    public int TargetChanneling { get; private set; }
 
     public int TargetLevel { get; private set; }
 
@@ -134,7 +136,8 @@ public class StateService
         InRangeCount = GetInt(21, GENERAL_ROW);
 
         TargetExists = GetBool(30, GENERAL_ROW);
-        TargetKick = GetBool(31, GENERAL_ROW);
+        TargetCasting = GetInt(31, GENERAL_ROW);
+        TargetChanneling = GetInt(32, GENERAL_ROW);
         TargetHpp = GetInt(35, GENERAL_ROW);
 
 
@@ -313,7 +316,7 @@ public class StateService
         buff.AppendLine($"InRangeCount: {InRangeCount}");
         buff.AppendLine($"PlayerBuffCount: {PlayerBuffs.Count(b => b.Exists)}");
 
-        buff.AppendLine($"Target: {TargetExists}, HPP: {TargetHpp}");
+        buff.AppendLine($"Target: {TargetExists}, HPP: {TargetHpp}, Casting: {TargetCasting}, Channeling: {TargetChanneling}");
         //buff.AppendLine($"TargetHPP: {TargetHpp}");
         //buff.AppendLine($"TargetKick: {TargetKick}");
 

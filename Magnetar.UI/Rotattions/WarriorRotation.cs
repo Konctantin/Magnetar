@@ -7,6 +7,9 @@ namespace Magnetar.UI.Rotattions;
 public class WarriorRotation : IRotation
 {
     public Ability[] Abilities { get; } = [
+        new ("Shield Bash") { Conditions = [
+            (state, ability) => state.IsKick && state.TargetCasting > 0 && state.TargetCasting < 300
+            ] },
         new ("Victory Rush") { Conditions = [
             (state, ability) => state.PlayerHpp < 90
             ] },
