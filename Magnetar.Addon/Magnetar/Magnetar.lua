@@ -208,6 +208,7 @@ function T.DumpAbilities()
                         local hasRange = C_ActionBar.HasRangeRequirements(button.action);
                         local isInRangeTarget = C_ActionBar.IsActionInRange(button.action, "target");
                         local isInRangeFocus = C_ActionBar.IsActionInRange(button.action, "focus");
+                        local cd_duration = C_ActionBar.GetActionCooldownDuration(button.action);
 
                         local flags = T.CreateFlag(
                             cd_info.isOnGCD,
@@ -226,8 +227,12 @@ function T.DumpAbilities()
                         ab.Magic:SetColorTexture(IntToColor(1));
                         ab.Type:SetColorTexture(IntToColor(typeInt));
                         ab.Flags:SetColorTexture(IntToColor(flags));
+
                         -- todo: try to get ability cooldown as color
-                        --ab.Cooldown:SetColorTexture(IntToColor(ready and 1 or 0));
+                        if cd_duration and cd_duration.GetRemainingDuration then
+                            local curve = cd_duration:EvaluateRemainingDuration(T.RemainingCurve, Enum.DurationTimeModifier.RealTime);
+                            ab.Cooldown:SetColorTexture(curve:GetRGBA());
+                        end
                         ab.HotKey:SetColorTexture(hotKeyColor.R, hotKeyColor.G, hotKeyColor.B, 1);
                         UpdateTextData(index, text);
                     end
@@ -294,7 +299,7 @@ local function InitMainFrame()
                 self:SetColorTexture(IntToColor(value and 1 or 0));
             elseif valType == 'number' then
                 self:SetColorTexture(IntToColor(value));
-            elseif valType == "table" and type(value.GetRGBA) == "function" then
+            elseif (valType == "table" or valType == "userdata") and type(value.GetRGBA) == "function" then
                 self:SetColorTexture(value:GetRGBA());
             else
                 self:SetColorTexture(0, 0, 0, 1);
