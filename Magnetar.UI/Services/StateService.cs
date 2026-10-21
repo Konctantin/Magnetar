@@ -202,7 +202,7 @@ public class StateService
             ab.Magic   = GetInt((x * 5) + 1, 2);
             ab.Type    = GetInt((x * 5) + 2, 2);
             ab.Flags   = (AbilityFlags)GetInt((x * 5) + 3, 2);
-            ab.Ready   = GetInt((x * 5) + 4, 2);
+            ab.Cooldown= GetInt((x * 5) + 4, 2);
             ab.HotKey  = GetHotKey((x * 5) + 5, 2);
 
             var matrix = GetPixels((x * 5) + 1, 12, 5, 10);
@@ -302,42 +302,28 @@ public class StateService
     {
         var buff = new StringBuilder();
 
-        buff.AppendLine($"Rect: {AreaRect} => Valid: {IsValidArea} ({ValidationError})");
-        buff.AppendLine($"Magic: {Magic}");
+        buff.AppendLine($"Rect: {AreaRect} => Valid: {IsValidArea} ({ValidationError}), Magic: {Magic}");
 
-        buff.AppendLine($"IsInWorld: {IsInWorld}");
-
-        buff.AppendLine($"Enable: {Enabled}");
-        buff.AppendLine($"AOE: {IsAoe}");
-        buff.AppendLine($"Burst: {IsBurst}");
-        buff.AppendLine($"Kick: {IsKick}");
-
-        buff.AppendLine($"Combat: {IsInCombat}");
-        buff.AppendLine($"Dead: {PlayerIsDead}");
+        buff.AppendLine($"State=> Enabled: {Enabled}, AOE: {IsAoe}, Burst: {IsBurst}, Kick: {IsKick}");
+        buff.AppendLine($"Player: {PlayerClass} [{PlayerForm}] ({PlayerLevel}) InCombat: {IsInCombat}");
+        buff.AppendLine($"PlayerHPP: {PlayerHpp}, Power: {PlayerPower}, Combo: {PlayerCombopoints}");
         buff.AppendLine($"Moving: {PlayerIsMoving}");
-        buff.AppendLine($"PlayerLevel: {PlayerLevel}");
-        buff.AppendLine($"PlayerClass: {PlayerClass}");
-        buff.AppendLine($"PlayerForm: {PlayerForm}");
         buff.AppendLine($"PlayerCasting: {PlayerCasting/1000f:0.00}");
         buff.AppendLine($"PlayerChanneling: {PlayerChanneling / 1000f:0.00}");
-
-        buff.AppendLine($"PlayerHPP: {PlayerHpp}");
-        buff.AppendLine($"PlayerPower: {PlayerPower}");
-        buff.AppendLine($"PlayerCombo: {PlayerCombopoints}");
         buff.AppendLine($"InRangeCount: {InRangeCount}");
         buff.AppendLine($"PlayerBuffCount: {PlayerBuffs.Count(b => b.Exists)}");
 
-        //todo: add more
+        buff.AppendLine($"Target: {TargetExists}, HPP: {TargetHpp}");
+        //buff.AppendLine($"TargetHPP: {TargetHpp}");
+        //buff.AppendLine($"TargetKick: {TargetKick}");
 
-        buff.AppendLine($"TargetExists: {TargetExists}");
-        buff.AppendLine($"TargetHPP: {TargetHpp}");
-        buff.AppendLine($"TargetKick: {TargetKick}");
+        buff.AppendLine();
         buff.AppendLine($">> Player Auras: >>>");
         foreach (var aura in PlayerBuffs)
         {
             if (aura.Exists)
             {
-                buff.AppendLine($"Aura Remains: {aura.Name} [{aura.Remains/100:N2}, Count: {aura.Count}]");
+                buff.AppendLine($"Aura: {aura.Name} [Remains: {aura.Remains/100:N2}, Count: {aura.Count}]");
             }
         }
         buff.AppendLine($">> Target Auras: >>>");
@@ -345,7 +331,7 @@ public class StateService
         {
             if (aura.Exists)
             {
-                buff.AppendLine($"Aura Remains: {aura.Name} [{aura.Remains / 100:N2}, Count: {aura.Count}]");
+                buff.AppendLine($"Aura: {aura.Name} [Remains: {aura.Remains / 100:N2}, Count: {aura.Count}]");
             }
         }
 
@@ -354,7 +340,7 @@ public class StateService
         {
             if (aura.Exists)
             {
-                buff.AppendLine($"Aura Remains: {aura.Name} [{aura.Remains / 100:N2}, Count: {aura.Count}]");
+                buff.AppendLine($"Aura: {aura.Name} [Remains: {aura.Remains / 100:N2}, Count: {aura.Count}]");
             }
         }
 

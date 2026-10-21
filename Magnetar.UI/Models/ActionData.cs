@@ -1,7 +1,4 @@
 using Magnetar.UI.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Magnetar.UI.Models;
 
@@ -15,7 +12,7 @@ public class ActionData
 
     public int Enabled { get; set; }
 
-    public int Ready { get; set; }
+    public int Cooldown { get; set; }
 
     public AbilityFlags Flags { get; set; }
 
@@ -29,6 +26,6 @@ public class ActionData
 
     public override string ToString()
     {
-        return $"[{Name}]: Type: {Type}, Flags: {Flags}, HotKey: {HotKey}";
+        return $"[{Name}]: Type: {Type}, Flags: {Flags}, Cooldown: {Cooldown/100:N2}, HotKey: {HotKey}";
     }
 }

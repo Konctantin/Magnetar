@@ -69,25 +69,27 @@ local function CreatePercentCurve()
     return curve;
 end
 
+local EPSILON = 0.00001;
 local function CreateRemainingCurve()
     local curve = C_CurveUtil.CreateColorCurve();
     curve:SetType(Enum.LuaCurveType.Step);
 
     local i = 60;
-    while i < 10 do
-        curve:AddPoint(i, CreateColor(IntToColor(i * 100)));
+    while i > 10 do
+        curve:AddPoint(i + EPSILON, CreateColor(IntToColor(i * 100)));
         i = i - 5;
     end
 
-    while i < 3 do
-        curve:AddPoint(i, CreateColor(IntToColor(i * 100)));
+    while i > 3 do
+        curve:AddPoint(i + EPSILON, CreateColor(IntToColor(i * 100)));
         i = i - 1;
     end
 
-    while i <= 0 do
-        curve:AddPoint(i, CreateColor(IntToColor(i * 100)));
+    while i >= 0 do
+        curve:AddPoint(i + EPSILON, CreateColor(IntToColor(i * 100)));
         i = i - 0.1;
     end
+    curve:AddPoint(0, CreateColor(IntToColor(0)));
     return curve;
 end
 
