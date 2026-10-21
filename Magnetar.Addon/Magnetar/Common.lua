@@ -28,6 +28,24 @@ function T.GetChannelRemains(unit)
     return remains;
 end
 
+function T.GetUnitCastingCurve(unit)
+    local duration = UnitCastingDuration(unit);
+    if type(duration) == "table" and duration.EvaluateRemainingDuration then
+        local result = duration:EvaluateRemainingDuration(T.RemainingCurve, Enum.DurationTimeModifier.RealTime);
+        return result;
+    end
+    return nil;
+end
+
+function T.GetUnitChannelCurve(unit)
+    local duration = UnitChannelDuration(unit);
+    if duration and duration.EvaluateRemainingDuration then
+        local result = duration:EvaluateRemainingDuration(T.RemainingCurve, Enum.DurationTimeModifier.RealTime);
+        return result;
+    end
+    return nil;
+end
+
 function T.InRangeCount(spellIdentifier)
     if not spellIdentifier or not C_Spell.SpellHasRange(spellIdentifier) then
         return 0;

@@ -69,6 +69,28 @@ local function CreatePercentCurve()
     return curve;
 end
 
+local function CreateRemainingCurve()
+    local curve = C_CurveUtil.CreateColorCurve();
+    curve:SetType(Enum.LuaCurveType.Step);
+
+    local i = 60;
+    while i < 10 do
+        curve:AddPoint(i, CreateColor(IntToColor(i * 100)));
+        i = i - 5;
+    end
+
+    while i < 3 do
+        curve:AddPoint(i, CreateColor(IntToColor(i * 100)));
+        i = i - 1;
+    end
+
+    while i <= 0 do
+        curve:AddPoint(i, CreateColor(IntToColor(i * 100)));
+        i = i - 0.1;
+    end
+    return curve;
+end
+
 local function createFlag(...)
     local accumulator = 0;
     local args = {...};
@@ -87,6 +109,7 @@ T.CreateFlag = createFlag;
 T.DurationFormatter = CreateRuleFormatter(GetDurationBreakpoints());
 T.StackFormatter = CreateRuleFormatter(GetStackBreakpoints());
 T.PercentCurve = CreatePercentCurve();
+T.RemainingCurve = CreateRemainingCurve();
 
 T.KeyMap = {
     ['ESCAPE'] = { R = 0xB8/255, G = 0x17/255, B = 0x20/255 }, -- 0x00B81720

@@ -113,13 +113,15 @@ local function UpdateGeneralInfo()
     T.GeneralBar[21]:SetColorValue(T.InRangeCount("Rend"));
 
     T.GeneralBar[30]:SetColorValue(UnitExists("target"));
-    --T.GeneralBar[31]:SetColorValue(T.CheckInterrupt("target"));
+    T.GeneralBar[31]:SetColorValue(T.GetUnitCastingCurve("target"));
+    T.GeneralBar[32]:SetColorValue(T.GetUnitChannelCurve("target"));
     T.GeneralBar[35]:SetColorValue(UnitHealthPercent("target", false, T.PercentCurve));
     T.GeneralBar[36]:SetColorValue(UnitPowerPercent("target", nil, false, T.PercentCurve));
     T.GeneralBar[37]:SetColorValue(UnitPowerPercent("target", Enum.PowerType.ComboPoints, false, T.PercentCurve));
 
     T.GeneralBar[50]:SetColorValue(UnitExists("focus"));
-    --T.GeneralBar[51]:SetColorValue(T.CheckInterrupt("focus"));
+    T.GeneralBar[51]:SetColorValue(T.GetUnitCastingCurve("focus"));
+    T.GeneralBar[52]:SetColorValue(T.GetUnitChannelCurve("focus"));
     T.GeneralBar[55]:SetColorValue(UnitHealthPercent("focus", false, T.PercentCurve));
     T.GeneralBar[56]:SetColorValue(UnitPowerPercent("focus", nil, false, T.PercentCurve));
     T.GeneralBar[57]:SetColorValue(UnitPowerPercent("focus", Enum.PowerType.ComboPoints, false, T.PercentCurve));
