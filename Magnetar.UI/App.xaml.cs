@@ -27,6 +27,7 @@ public partial class App : Application
             var services = new ServiceCollection();
             services.AddSingleton(provider => UI.Properties.Settings.Default);
 
+            services.AddSingleton<AuraRepoService>();
             services.AddSingleton<ClickerService>();
             services.AddSingleton<ScreenSnapshotService>();
             services.AddSingleton<ForegroundWindowService>();

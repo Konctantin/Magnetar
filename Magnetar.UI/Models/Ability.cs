@@ -1,8 +1,12 @@
+using Magnetar.UI.Services;
+
 namespace Magnetar.UI.Models;
 
-public class Ability
+public class Ability(string name)
 {
-    public List<Condition> Conditions { get; set; } = [];
+    public string Name => name;
 
-    public List<Ability> Children { get; set; } = [];
+    public Func<StateService, ActionData, bool>[] Conditions { get; set; } = [];
+
+    //public List<Ability> Children { get; set; } = [];
 }

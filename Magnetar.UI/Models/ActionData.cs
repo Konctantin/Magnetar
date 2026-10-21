@@ -17,6 +17,8 @@ public class ActionData
 
     public int Ready { get; set; }
 
+    public AbilityFlags Flags { get; set; }
+
     public KeyRecord HotKey { get; set; } = new KeyRecord(0, 0);
 
     public bool IsReady { get; set; } = false;
@@ -27,6 +29,6 @@ public class ActionData
 
     public override string ToString()
     {
-        return $"[{Name}]: Type: {Type}, Ready: {Ready}, HotKey: {HotKey}";
+        return $"[{Name}]: Type: {Type}, Flags: {Flags}, HotKey: {HotKey}";
     }
 }

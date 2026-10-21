@@ -1,6 +1,69 @@
 ﻿local addonName, T = ...;
 _G[addonName] = T;
 
+local DURATION_EPSILON = 0.00001;
+
+local SWATCH_TEXTURE = "Interface\\Buttons\\WHITE8X8";
+
+local function Swatch(r, g, b)
+    return ("\124T%s:%d:%d:0:0:8:8:0:8:0:8:%d:%d:%d\124t"):format(SWATCH_TEXTURE, 2, 2, r, g, b);
+end
+
+local function IntToColor(v)
+    return (v % 256) / 255, (math.floor(v / 256) % 256) / 255, (math.floor(v / 65536) % 256) / 255, 1;
+end
+
+local function IntToTextureColor(v)
+    return (v % 256), (math.floor(v / 256) % 256), (math.floor(v / 65536) % 256), 1;
+end
+
+local function IntToFormat(val)
+    local r, g, b = IntToTextureColor(val);
+    local result = Swatch(r, g, b);
+    return result;
+end
+
+-- /dump Magnetar.IntToFormat(200)
+T.IntToFormat = IntToFormat;
+
+-- /dump Magnetar.DurationBreakpoints
+local function GetDurationBreakpoints()
+    local i = 49;
+    T.DurationBreakpoints = { { threshold = 5000, format = IntToFormat(50) } };
+    while i > 10 do
+        table.insert(T.DurationBreakpoints, { threshold = i + DURATION_EPSILON, format = IntToFormat(i*100) });
+        i = i - 1;
+    end
+    while i > 2 do
+        table.insert(T.DurationBreakpoints, { threshold = i + DURATION_EPSILON, format = IntToFormat(i*100) });
+        i = i - 0.5;
+    end
+    while i >= 0 do
+        table.insert(T.DurationBreakpoints, { threshold = i + DURATION_EPSILON, format = IntToFormat(i*100) });
+        i = i - 0.1;
+    end
+    --print("Count Duration: "..tostring(#T.DurationBreakpoints));
+    return T.DurationBreakpoints;
+end
+
+local function GetStackBreakpoints()
+    local bps = { };
+    for i = 0, 50 do
+        table.insert(bps, { threshold = i, format = IntToFormat(i) });
+    end
+    return bps;
+end
+
+local function CreateRuleFormatter(breakpoints)
+    local f = C_StringUtil.CreateNumericRuleFormatter();
+    f:SetBreakpoints(breakpoints);
+    return f;
+end
+
+-- /dump Magnetar.DurationFormatter
+T.DurationFormatter = CreateRuleFormatter(GetDurationBreakpoints());
+T.StackFormatter = CreateRuleFormatter(GetStackBreakpoints());
+
 T.KeyMap = {
     ['ESCAPE'] = { R = 0xB8/255, G = 0x17/255, B = 0x20/255 }, -- 0x00B81720
     ['-']      = { R = 0x3D/255, G = 0x30/255, B = 0x80/255 }, -- 0x003D3080
@@ -91,43 +154,3 @@ T.KeyMap = {
     ['S-Z']    = { R = 0x6E/255, G = 0x9D/255, B = 0x60/255 }, -- 0x006E9D60
 };
 
-
-T.DURATION_OVER_MAX = { 0, 0.25, 0.25, 0.25 };
-T.DURATION_EPSILON = 0.00001;
-
-T.DURATION_PALETTE = {
-    { 0.0, 0.50, 0, 1.00 },
-    { 0.1, 0.60, 0, 1.00 },
-    { 0.2, 0.70, 0, 1.00 },
-    { 0.3, 0.80, 0, 1.00 },
-    { 0.4, 0.90, 0, 1.00 },
-    { 0.5, 1.00, 0, 1.00 },
-    { 0.6, 1.00, 0, 0.80 },
-    { 0.7, 1.00, 0, 0.60 },
-    { 0.8, 1.00, 0, 0.40 },
-    { 0.9, 1.00, 0, 0.20 },
-    { 1.0, 1.00, 0, 0.00 },
-    { 2.0, 1.00, 0.20, 0 },
-    { 3.0, 1.00, 0.40, 0 },
-    { 4.0, 1.00, 0.60, 0 },
-    { 5.0, 1.00, 0.80, 0 },
-    { 6.0, 1.00, 1.00, 0 },
-    { 7.0, 0.75, 1.00, 0 },
-    { 8.0, 0.50, 1.00, 0 },
-    { 9.0, 0.25, 1.00, 0 },
-    { 10.0, 0.00, 1.00, 0 },
-};
-
--- Стаки: 1..10 яркие оттенки, 11..20 те же тёмные, 21..30 те же пастельные, 0 серый, 31+ белый
-T.STACK_HUES = {
-    { 255, 234, 0 },
-    { 255, 149, 0 },
-    { 255, 64, 0 },
-    { 255, 0, 0 },
-    { 255, 0, 128 },  -- жёлтый .. малиновый
-    { 213, 0, 255 },
-    { 43, 0, 255 },
-    { 0, 128, 255 },
-    { 0, 255, 255 },
-    { 0, 255, 0 },  -- фиолетовый .. зелёный
-};

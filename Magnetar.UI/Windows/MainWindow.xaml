@@ -13,7 +13,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="48*"/>
-            <ColumnDefinition Width="509*"/>
+            <ColumnDefinition Width="316*"/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="243*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -36,7 +37,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3">
             <TextBlock Text="Interval: " Margin="5,0,5,0"/>
             <TextBox Width="50" Text="{Binding Interval, UpdateSourceTrigger=PropertyChanged}" />
             <TextBlock Text="AreaWidth: " Margin="5,0,5,0"/>
@@ -50,9 +51,38 @@
                                 FontFamily="Consolas"
                                 />
 
-        <Image Source="{Binding CurrentImage}" Grid.Column="2" Grid.Row="1" Stretch="Uniform" Margin="5" />
+        <Image Source="{Binding CurrentImage}" Grid.Column="3" Grid.Row="1" Stretch="Uniform" Margin="5,5,5,5" />
 
-        <TextBlock Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Text="{Binding CurrentState}" />
+        <TextBox Grid.Column="3" Grid.Row="2"
+                   Grid.RowSpan="3" Text="{Binding CurrentState, Mode=OneWay}"
+                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    />
 
+
+        <ListBox ItemsSource="{Binding AuraIconItems}"
+                 HorizontalContentAlignment="Stretch"
+                 Grid.Column="2"
+                 Grid.Row="1"
+                 Grid.RowSpan="3">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5,0,5,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding Icon}"
+                               Width="24"
+                               Height="24"
+                               Margin="0,0,5,0"
+                               VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
+                                 VerticalAlignment="Center"
+                                 Padding="5"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </Window>

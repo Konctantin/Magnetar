@@ -2,6 +2,7 @@ using Magnetar.UI.Common;
 using Magnetar.UI.Models;
 using Magnetar.UI.Properties;
 using Magnetar.UI.Services;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -19,6 +20,8 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     private readonly MagnetarService _magnetarService;
     private readonly StateService _stateService;
 
+    private readonly AuraRepoService auraRepoervice;
+
     private readonly Settings _settings;
 
     public event Action? RequestShowWindow;
@@ -28,6 +31,8 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     public ICommand ShowWindowCommand { get; }
 
     public ICommand ExecuteActionCommand { get; }
+
+    public ICommand SaveAbilities { get; }
 
     public ICommand ExitCommand { get; }
 
@@ -91,20 +96,38 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public MainViewModel(MagnetarService magnetarService, StateService stateService, Settings settings)
+    public ObservableRangeCollection<AuraIconData> AuraIconItems { get; set; } = [];
+
+
+    public MainViewModel(MagnetarService magnetarService, StateService stateService, AuraRepoService auraRepoervice, Settings settings)
     {
         // Инициализируем команды
         ShowWindowCommand = new RelayCommand(_ => RequestShowWindow?.Invoke());
         ExecuteActionCommand = new RelayCommand(_ => ExecuteCustomAction());
         ExitCommand = new RelayCommand(_ => RequestCloseApplication?.Invoke());
+        SaveAbilities = new RelayCommand(_ => this.auraRepoervice.Save());
 
         _magnetarService = magnetarService;
         _stateService = stateService;
+        this.auraRepoervice = auraRepoervice;
         _settings = settings;
 
         // Подписываемся на события фонового сервиса
         _magnetarService = magnetarService;
         _magnetarService.AreaCaptured += OnAreaCaptured;
+        this.auraRepoervice.Updated += AuraRepoervice_Updated;
+
+        var data = this.auraRepoervice.Data.Values.Select(d => new AuraIconData(d)
+            { OnNameChanged = () => { this.auraRepoervice.Save(); } });
+        AuraIconItems.AddRange(data);
+    }
+
+    private void AuraRepoervice_Updated(object? sender, AauraBuffer e)
+    {
+        var data = new AuraIconData(e);
+        data.OnNameChanged = () => { this.auraRepoervice.Save(); };
+        AuraIconItems.Add(data);
+        //OnPropertyChanged(nameof(AuraIconItems));
     }
 
     private void OnAreaCaptured(Bitmap sharedBitmap)

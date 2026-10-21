@@ -1,8 +1,6 @@
-using H.NotifyIcon.Core;
 using Magnetar.UI.Common;
 using Magnetar.UI.Models;
 using System.Drawing;
-using System.Globalization;
 using System.Text;
 
 namespace Magnetar.UI.Services;
@@ -10,6 +8,7 @@ namespace Magnetar.UI.Services;
 public class StateService
 {
     const int MAX_ABILITIES = 24;
+
     const int MAX_AURAS = 20;
 
     const int GENERAL_ROW = 1;
@@ -30,7 +29,7 @@ public class StateService
 
     public bool IsBurst { get; private set; }
 
-    public bool IsInWorld { get; private set; }
+    public bool IsInWorld => Magic == 123456;
 
     public bool IsInCombat { get; private set; }
 
@@ -53,6 +52,9 @@ public class StateService
     public int PlayerCasting { get; private set; }
 
     public int PlayerChanneling { get; private set; }
+    public int PlayerBuffCount { get; private set; }
+
+    public int InRangeCount { get; private set; }
 
 
     public WowClass TargetClass { get; private set; }
@@ -81,14 +83,24 @@ public class StateService
     public int[] Colors = new int[200];
 
     private readonly ForegroundWindowService foreground;
+    private readonly AuraRepoService auraRepoService;
 
-    public StateService(ForegroundWindowService foreground)
+    public StateService(ForegroundWindowService foreground, AuraRepoService auraRepoService)
     {
         this.foreground = foreground;
+        this.auraRepoService = auraRepoService;
+
         for (int i = 0; i < PlayerAbilities.Length; ++i)
-        {
             PlayerAbilities[i] = new ActionData();
-        }
+
+        for (int i = 0; i < PlayerBuffs.Length; ++i)
+            PlayerBuffs[i] = new AuraData();
+
+        for (int i = 0; i < TargetDebuffs.Length; ++i)
+            TargetDebuffs[i] = new AuraData();
+
+        for (int i = 0; i < FocusDebuffs.Length; ++i)
+            FocusDebuffs[i] = new AuraData();
     }
 
 
@@ -119,6 +131,7 @@ public class StateService
         PlayerForm = GetInt(18, GENERAL_ROW);
         PlayerCasting = GetInt(19, GENERAL_ROW);
         PlayerChanneling = GetInt(20, GENERAL_ROW);
+        InRangeCount = GetInt(21, GENERAL_ROW);
 
         TargetExists = GetBool(30, GENERAL_ROW);
         TargetKick = GetBool(31, GENERAL_ROW);
@@ -127,9 +140,9 @@ public class StateService
 
         ParsePlayerAbilities();
 
-        ParseAuras(0); // player buffs
-        ParseAuras(0); // target debuffs
-        ParseAuras(0); // focus debuffs
+        ParseAuras(PlayerBuffs, 22); // player buffs
+        ParseAuras(TargetDebuffs, 35); // target debuffs
+        ParseAuras(FocusDebuffs, 50); // focus debuffs
     }
 
     private bool ParseValidation(ref Rect rect)
@@ -188,9 +201,9 @@ public class StateService
             var ab = PlayerAbilities[x];
             ab.Magic   = GetInt((x * 5) + 1, 2);
             ab.Type    = GetInt((x * 5) + 2, 2);
-            ab.Enabled = GetInt((x * 5) + 3, 2);
+            ab.Flags   = (AbilityFlags)GetInt((x * 5) + 3, 2);
             ab.Ready   = GetInt((x * 5) + 4, 2);
-            ab.HotKey = GetHotKey((x * 5) + 5, 2);
+            ab.HotKey  = GetHotKey((x * 5) + 5, 2);
 
             var matrix = GetPixels((x * 5) + 1, 12, 5, 10);
             var text = WoWPixelDecoder.DecodeTextFromMatrix(matrix);
@@ -198,8 +211,37 @@ public class StateService
         }
     }
 
-    private void ParseAuras(int rowOffset)
+    private void ParseAuras(AuraData[] auras, int rowOffset)
     {
+        for (int x = 0; x < MAX_AURAS; ++x)
+        {
+            var aura = auras[x];
+
+            aura.Exists = false;
+            aura.Remains = 0;
+            aura.Count = 0;
+
+            var x_offset = (x * 10);
+
+            var m1 = GetInt(x_offset + 1, rowOffset);
+            var m2 = GetInt(x_offset + 2, rowOffset);
+            var m3 = GetInt(x_offset + 1, rowOffset + 1);
+            var m4 = GetInt(x_offset + 2, rowOffset + 1);
+
+            if (m1 == 22 && m2 == 22 && m3 == 22 && m4 == 22)
+            {
+                aura.Remains = GetInt(x_offset + 3, rowOffset);
+                aura.Count = GetInt(x_offset + 5, rowOffset);
+
+                GetIcon(aura, x_offset + 1, rowOffset + 11);
+                auraRepoService.AddIfNotExists(aura.Hash, aura.Image);
+                aura.Name = auraRepoService.GetName(aura.Hash);
+                //aura.Image.Save("d:/temp/icons/123.bmp");
+                // todo: parse icon
+
+                aura.Exists = true;
+            }
+        }
     }
 
     private KeyRecord GetHotKey(int x, int y)
@@ -249,6 +291,13 @@ public class StateService
         return result;
     }
 
+    public void GetIcon(AuraData aura, int x_start, int y_start)
+    {
+        var x_real = AreaRect.Left + x_start - 1;
+        var y_real = AreaRect.Bottom - y_start; // bottom is a zero level ???
+        aura.CropIcon(foreground.Image, x_real, y_real);
+    }
+
     public override string ToString()
     {
         var buff = new StringBuilder();
@@ -256,7 +305,7 @@ public class StateService
         buff.AppendLine($"Rect: {AreaRect} => Valid: {IsValidArea} ({ValidationError})");
         buff.AppendLine($"Magic: {Magic}");
 
-        buff.AppendLine($"IsInWorld: {Magic == 123456}");
+        buff.AppendLine($"IsInWorld: {IsInWorld}");
 
         buff.AppendLine($"Enable: {Enabled}");
         buff.AppendLine($"AOE: {IsAoe}");
@@ -275,12 +324,39 @@ public class StateService
         buff.AppendLine($"PlayerHPP: {PlayerHpp}");
         buff.AppendLine($"PlayerPower: {PlayerPower}");
         buff.AppendLine($"PlayerCombo: {PlayerCombopoints}");
+        buff.AppendLine($"InRangeCount: {InRangeCount}");
+        buff.AppendLine($"PlayerBuffCount: {PlayerBuffs.Count(b => b.Exists)}");
 
         //todo: add more
 
         buff.AppendLine($"TargetExists: {TargetExists}");
         buff.AppendLine($"TargetHPP: {TargetHpp}");
         buff.AppendLine($"TargetKick: {TargetKick}");
+        buff.AppendLine($">> Player Auras: >>>");
+        foreach (var aura in PlayerBuffs)
+        {
+            if (aura.Exists)
+            {
+                buff.AppendLine($"Aura Remains: {aura.Name} [{aura.Remains/100:N2}, Count: {aura.Count}]");
+            }
+        }
+        buff.AppendLine($">> Target Auras: >>>");
+        foreach (var aura in TargetDebuffs)
+        {
+            if (aura.Exists)
+            {
+                buff.AppendLine($"Aura Remains: {aura.Name} [{aura.Remains / 100:N2}, Count: {aura.Count}]");
+            }
+        }
+
+        buff.AppendLine($">> Focus Auras: >>>");
+        foreach (var aura in FocusDebuffs)
+        {
+            if (aura.Exists)
+            {
+                buff.AppendLine($"Aura Remains: {aura.Name} [{aura.Remains / 100:N2}, Count: {aura.Count}]");
+            }
+        }
 
         buff.AppendLine();
         buff.AppendLine($">> Abilities: >>>");
