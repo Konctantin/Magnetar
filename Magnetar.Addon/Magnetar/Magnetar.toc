@@ -8,6 +8,7 @@
 ## SavedVariablesPerCharacter: MAGNETAR_PRESONAL_STORAGE
 ## RequiredDeps: Blizzard_AuraContainer
 
+SpellMainer.lua
 Constants.lua
 Common.lua
 ControlPanel.lua
