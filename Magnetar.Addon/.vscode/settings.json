@@ -24,6 +24,7 @@
         "GameTooltip_AddNormalLine",
         "GameTooltip_Hide",
         "GameTooltip",
-        "ActionButtonSpellAlertManager"
+        "ActionButtonSpellAlertManager",
+        "SlashCmdList"
     ]
 }

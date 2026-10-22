@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace Magnetar.UI.Common;
@@ -23,7 +22,7 @@ public static class KeyboardNative
     public static extern ushort GetKeyState(int nVirtKey);
 
     [DllImport("user32.dll", EntryPoint = "PostMessageA", SetLastError = true)]
-    public static extern bool PostMessage(IntPtr hWnd, uint msg, int wParam, int lParam);
+    public static extern bool PostMessage(nint hWnd, uint msg, int wParam, int lParam);
 
     public static bool IsAltKeyDown() => IsKeyDown(VK_ALT);
 
