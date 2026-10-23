@@ -223,8 +223,9 @@ public class StateService
             aura.Exists = false;
             aura.Remains = 0;
             aura.Count = 0;
+            aura.Name = "";
 
-            var x_offset = (x * 10);
+            var x_offset = (x * 5);
 
             var m1 = GetInt(x_offset + 1, rowOffset);
             var m2 = GetInt(x_offset + 2, rowOffset);
@@ -236,9 +237,12 @@ public class StateService
                 aura.Remains = GetInt(x_offset + 3, rowOffset);
                 aura.Count = GetInt(x_offset + 5, rowOffset);
 
-                GetIcon(aura, x_offset + 1, rowOffset + 11);
-                auraRepoService.AddIfNotExists(aura.Hash, aura.Image);
-                aura.Name = auraRepoService.GetName(aura.Hash);
+                var matrix = GetPixels(x_offset + 1, rowOffset + 32, 5, 30);
+                var text = WoWPixelDecoder.DecodeTextFromMatrix(matrix);
+                aura.Name = text;
+                //GetIcon(aura, x_offset + 1, rowOffset + 11);
+                //auraRepoService.AddIfNotExists(aura.Hash, aura.Image);
+                //aura.Name = auraRepoService.GetName(aura.Hash);
                 //aura.Image.Save("d:/temp/icons/123.bmp");
                 // todo: parse icon
 

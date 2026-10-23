@@ -43,50 +43,10 @@ local function ApplyScales()
     if InCombatLockdown() then
         return;
     end
-    for _, key in ipairs({ "PlayerContainer", "TargetContainer" }) do
-        local c = T[key]
-        if c then c:SetScale(s / UIParent:GetEffectiveScale()) end
-    end
-end
-
-local function UpdateTextData(blockIndex, text)
-    local pixels = T.AbilityBar[blockIndex];
-    if not pixels then return end
-    pixels = pixels.TextBar;
-    if not pixels then return end
-
-    local byteLen = text and string.len(text) or 0;
-    local maxBytes = 75;
-
-    if byteLen > maxBytes then
-        local safeLength = maxBytes;
-        while safeLength > 0 do
-            local byte = string.byte(text, safeLength);
-            if byte and byte >= 128 and byte <= 191 then
-                safeLength = safeLength - 1;
-            else
-                safeLength = safeLength - 1;
-                break;
-            end
-        end
-        text = string.sub(text, 1, safeLength);
-        byteLen = safeLength;
-    end
-
-    local byteIndex = 1;
-    for y = 1, 10 do
-        for x = 1, 5 do
-            if byteIndex > byteLen then
-                pixels[x][y]:SetColorTexture(0, 0, 0, 1);
-            else
-                local r = (string.byte(text, byteIndex) or 0) / 255;
-                local g = (string.byte(text, byteIndex + 1) or 0) / 255;
-                local b = (string.byte(text, byteIndex + 2) or 0) / 255;
-                pixels[x][y]:SetColorTexture(r, g, b, 1);
-                byteIndex = byteIndex + 3;
-            end
-        end
-    end
+    -- for _, key in ipairs({ "PlayerContainer", "TargetContainer" }) do
+    --     local c = T[key]
+    --     if c then c:SetScale(s / UIParent:GetEffectiveScale()) end
+    -- end
 end
 
 local function UpdateGeneralInfo()
@@ -151,6 +111,7 @@ local function OnEvent(self, event, arg1)
         self.initialized = true;
         if T.CreateControlPanel then T.CreateControlPanel() end
         if T.ControlPanel then T.ControlPanel:Show() end
+        T.CreateAuraFrames();
         self:SetScript("OnUpdate", OnUpdate);
         print("|cff00ff00PixelTable|r загружен. Таблица внизу слева.")
     elseif event == "PLAYER_TARGET_CHANGED" then
@@ -234,7 +195,7 @@ function T.DumpAbilities()
                             ab.Cooldown:SetColorTexture(curve:GetRGBA());
                         end
                         ab.HotKey:SetColorTexture(hotKeyColor.R, hotKeyColor.G, hotKeyColor.B, 1);
-                        UpdateTextData(index, text);
+                        ab.TextBar:SetText(text);
                     end
                     index = index + 1;
                 end
@@ -331,6 +292,7 @@ local function InitMainFrame()
         ab.Flags    = CreateAbilityPixel(ab, 2, 0);
         ab.Cooldown = CreateAbilityPixel(ab, 3, 0);
         ab.HotKey   = CreateAbilityPixel(ab, 4, 0);
+        ab.TextBar  = T.CreateTextCell(ab, 5, 10);
 
         ab.ResetData = function(self)
             if self.Magic then self.Magic:SetColorTexture(0, 0, 0, 1) end
@@ -341,20 +303,12 @@ local function InitMainFrame()
             if self.TextBar then
                 for x = 1, #self.TextBar do
                     for y = 1, #self.TextBar[x] do
-                        self.TextBar[x][y]:SetColorTexture(0, 0, 0, 1)
+                        self.TextBar[x][y]:SetColorTexture(0, 2, 0, 1);
                     end
                 end
             end
         end;
 
-        ab.TextBar = {};
-        for x = 1, ABILITY_WIDTH do
-            ab.TextBar[x] = {};
-            for y = 1, ABILITY_HEIGHT-1 do
-                -- +1 y offset
-                ab.TextBar[x][y] = CreateAbilityPixel(ab, x-1, ABILITY_HEIGHT-y);
-            end
-        end
         T.AbilityBar[i] = ab;
     end
 
@@ -381,6 +335,7 @@ local WHITE_TEXT_CURVE = C_CurveUtil.CreateColorCurve();
 WHITE_TEXT_CURVE:SetType(Enum.LuaCurveType.Step);
 WHITE_TEXT_CURVE:AddPoint(0, CreateColor(1, 1, 1, 1));
 
+-- /dump Magnetar.auras[1]
 T.auras = {} -- debug
 
 local function CreateCellAura(button)
@@ -397,13 +352,17 @@ end
 local function InitAuraButton(button)
     table.insert(T.auras, button);
 
-    button:SetSize(AURA_CELL, AURA_CELL + 2);
+    local nn = button:GetParent().SpellNameMy
+    print(nn);
+
+    button:SetSize(5, 10 + 2);
 
     -- icon
-    button.Icon = button:CreateTexture(nil, "OVERLAY");
-    button.Icon:SetSize(AURA_CELL, AURA_CELL);
+    button.Icon = T.CreateTextCell(button, 5, 10);-- button:CreateTexture(nil, "OVERLAY");
+    button.Icon:SetText(nn)
+    --button.Icon:SetSize(5, 10);
     button.Icon:SetPoint("TOP", button, "TOP", 0, 0);
-    button:SetIcon(button.Icon);
+    --button:SetIcon(button.Icon);
 
     -- Magic marker
     button.Magic = button:CreateTexture(nil, "OVERLAY");
@@ -451,8 +410,41 @@ local function CreateAuraBar(unit, filter, row)
     return c;
 end
 
-T.PlayerContainer = CreateAuraBar("player", "HELPFUL|PLAYER|RAID", 22);
-T.TargetContainer = CreateAuraBar("target", "HARMFUL|PLAYER", 35);
-T.FocusContainer = CreateAuraBar("focus", "HARMFUL|PLAYER", 50);
+function T.CreateAuras(list, row, unit, filter)
+    local container = {};
+    local i = 1;
+    for k,v in pairs(list) do
+        print("PlayerContainer: ", k)
+        local c = CreateFrame("AuraContainer", 'aura_'..tostring(row)..'_'..tostring(i), T.MagnetarFrame, "CustomAuraContainerTemplate");
+        c.SpellNameMy = k;
+        c:SetSize(5, 11);
+        c:SetFrameLevel(100);
+        c:SetPoint("BOTTOMLEFT", T.MagnetarFrame, "BOTTOMLEFT", (i-1)*5, row);
+        c:SetUnit(unit);
+        c:SetFlowLayoutAxis(AnchorUtil.FlowLayoutAxis.Horizontal);
+        c:SetFlowLayoutGrowthDirection(1, -1);
+        c:AddAuraGroup("ma_".. unit.."_"..tostring(i), filter, {
+            maxFrameCount = 1,
+            initializeFrame = InitAuraButton
+        });
+        c:UpdateAllAuras();
+        table.insert(container, c);
+        i = i + 1;
+    end
+    return container;
+end
+
+function T.CreateAuraFrames()
+    local class = select(2, UnitClass("player"));
+    local auras = T.AURAS[class];
+    if auras then
+        print("PlayerContainer")
+        T.PlayerContainer = T.CreateAuras(auras, 22, "player", "HELPFUL|PLAYER|RAID");
+    end
+end
+
+--T.PlayerContainer = CreateAuraBar("player", "HELPFUL|PLAYER|RAID", 22);
+--T.TargetContainer = CreateAuraBar("target", "HARMFUL|PLAYER", 35);
+--T.FocusContainer = CreateAuraBar("focus", "HARMFUL|PLAYER", 50);
 
 ApplyScales();

@@ -21,7 +21,7 @@ public class WarriorRotation : IRotation
 
         new ("Thunder Clap") { Conditions = [
             (state, ability) => state.InRangeCount < 3 && state.InRangeCount > 0,
-            (state, ability) => state.TargetDebuffs.FirstOrDefault(a => a.Name == "Thunder Clap") == null,
+            (state, ability) => state.TargetDebuffs.FirstOrDefault(a => a.Name == "Thunder Clap")?.Exists != true,
             ] },
 
         new ("Sunder Armor") { Conditions = [
@@ -30,7 +30,7 @@ public class WarriorRotation : IRotation
 
         new ("Rend") {
             Conditions = [
-                (state, ability) => state.TargetDebuffs.FirstOrDefault(a => a.Name == "Rend") == null,
+                (state, ability) => state.TargetDebuffs.FirstOrDefault(a => a.Name == "Rend")?.Exists != true,
                 (state, ability) => (state.TargetDebuffs.FirstOrDefault(a => a.Name == "Sunder Armor")?.Count ?? 0) == 5
                 ]
         },
@@ -48,5 +48,13 @@ public class WarriorRotation : IRotation
                     && state.InRangeCount > 1
                     && state.PlayerPower > 30
             ] },
+
+        new("Demoralizing Shout") {
+            Conditions = [
+                (state, ability) => state.InRangeCount > 0
+                && state.TargetDebuffs.FirstOrDefault(a => a.Name == "Demoralizing Shout")?.Exists != true
+            ] },
         ];
+
+
 }

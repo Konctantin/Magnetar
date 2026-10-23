@@ -2,12 +2,18 @@
 local function TableToJSON(tbl)
     local result = "{\n";
     for name, ids in pairs(tbl) do
-        result = result .. string.format('  "%s": [\n', name:gsub('"', '\\"'));
+		result = result .. string.format('  "%s": [', name:gsub('"', '\\"'));
+		for icon, spells in pairs(ids) do
+		    for _, sp in ipairs(spells) do
+			    
+			end
+		end
+        result = result .. string.format('  "%s": [', name:gsub('"', '\\"'));
         local idStrings = {};
         for _, id in ipairs(ids) do
-            table.insert(idStrings, string.format("    %d", id));
+            table.insert(idStrings, id);
         end
-        result = result .. table.concat(idStrings, ",\n") .. "\n  ],\n";
+        result = result .. table.concat(idStrings, ",") .. "],\n";
     end
     -- Убираем последнюю запятую
     if result:sub(-2, -2) == "," then result = result:sub(1, -3) .. "\n" end
@@ -18,25 +24,29 @@ end
 local function StartSpellMining()
     print("|cff00ffff[DataMiner]|r Начинаю сканирование базы заклинаний. Пожалуйста, подождите...");
     
-    local parsedData = {}; -- Сюда пишем [Имя заклинания] = {id1, id2, ...}
+    MAGNETAR_DB = {}; -- Сюда пишем [Имя заклинания] = {id1, id2, ...}
     
     local CURRENT_ID = 1;
-    local MAX_ID = 500000; -- Максимальный ID для сканирования (хватит для большинства классических баффов)
+    local MAX_ID = 1000000; -- Максимальный ID для сканирования (хватит для большинства классических баффов)
     local BATCH_SIZE = 5000; -- Сколько ID проверять за один кадр (чтобы игра не зависала)
     
     local function ScanBatch()
         local limit = math.min(CURRENT_ID + BATCH_SIZE, MAX_ID);
         
         for id = CURRENT_ID, limit do
+			-- /dump C_Spell.GetSpellInfo(2363)
             -- Проверяем существование заклинания через современный API Midnight
             local spellInfo = C_Spell.GetSpellInfo(id);
             if spellInfo and spellInfo.name and spellInfo.name ~= "" then
                 -- Фильтруем: берем только те, у которых есть реальная иконка (это отсекает технический мусор)
                 if spellInfo.iconID and spellInfo.iconID > 0 then
-                    if not parsedData[spellInfo.name] then
-                        parsedData[spellInfo.name] = {};
+                    if not MAGNETAR_DB[spellInfo.name] then
+                        MAGNETAR_DB[spellInfo.name] = {};
                     end
-                    table.insert(parsedData[spellInfo.name], id);
+					if not MAGNETAR_DB[spellInfo.name][spellInfo.iconID] then
+						MAGNETAR_DB[spellInfo.name][spellInfo.iconID] = {};
+					end
+                    table.insert(MAGNETAR_DB[spellInfo.name][spellInfo.iconID], id);
                 end
             end
         end
@@ -53,7 +63,7 @@ local function StartSpellMining()
         else
             -- Сканирование завершено! Выводим результат
             print("|cff00ffff[DataMiner]|r Сканирование успешно завершено!");
-            ShowOutputWindow(TableToJSON(parsedData));
+            --ShowOutputWindow(TableToJSON(MAGNETAR_DB));
         end
     end
     
